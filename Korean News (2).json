@@ -1,0 +1,195 @@
+{
+  "name": "Korean News",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "hour": 9
+            }
+          ]
+        }
+      },
+      "id": "cc8bd870-09ab-485d-be3f-10ea070a2476",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://newsapi.org/v2/everything",
+        "options": {},
+        "queryParametersUi": {
+          "parameter": [
+            {
+              "name": "language",
+              "value": "ko"
+            },
+            {
+              "name": "apiKey",
+              "value": "042b5275e0ab4a959a05e8a363aae88d"
+            },
+            {
+              "name": "q",
+              "value": "korea"
+            },
+            {
+              "name": "sortBy",
+              "value": "publishedAt"
+            }
+          ]
+        }
+      },
+      "id": "4e12b10c-337b-456f-a9b7-b9265cddd0bb",
+      "name": "Get Korean News",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [
+        200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "summary",
+              "value": "={{$json[\"candidates\"][0][\"content\"][\"parts\"][0][\"text\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f49023fb-5bac-49c5-b0f2-7f996dc15de2",
+      "name": "Set Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        620,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "pageId": {
+          "__rl": true,
+          "value": "=https://www.notion.so/News-Summary-23e3dbdb0fdc8047a101d87c52b0d133",
+          "mode": "url"
+        },
+        "title": "Today's Korea news",
+        "blockUi": {
+          "blockValues": [
+            {
+              "type": "heading_1",
+              "textContent": "=📰 Today's Korea News Summary"
+            },
+            {
+              "textContent": "={{$node[\"Set Fields\"].json[\"summary\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "845cf184-2506-4734-9ca4-05c421065bed",
+      "name": "Save to Notion",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 1,
+      "position": [
+        800,
+        0
+      ],
+      "credentials": {
+        "notionApi": {
+          "id": "xxUfMhtu0G2TidQl",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=AIzaSyBPxpySUmvPifVn-U3hHUzNy6fIKiIx5JU",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Content-Type\": \"application/json\"\n}\n",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({\n  contents: [\n    {\n      parts: [\n        {\n          text:\n`Please summarize and translate the following 3 Korean news articles into English.\nFormat the result with bullets and keep each summary within 2~3 sentences.\n\nARTICLE 1:\n${$json[\"articles\"][0][\"content\"]}\n\nARTICLE 2:\n${$json[\"articles\"][1][\"content\"]}\n\nARTICLE 3:\n${$json[\"articles\"][2][\"content\"]}`\n        }\n      ],\n      role: \"user\"\n    }\n  ]\n}) }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        400,
+        0
+      ],
+      "id": "bf45a71b-9d6c-4e97-bc6e-799b9492a3ee",
+      "name": "Gemini Summarize1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Korean News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Korean News": {
+      "main": [
+        [
+          {
+            "node": "Gemini Summarize1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Fields": {
+      "main": [
+        [
+          {
+            "node": "Save to Notion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Summarize1": {
+      "main": [
+        [
+          {
+            "node": "Set Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d7b3cd8e-8231-42e2-8bed-f5c8e8a28481",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "47602d97fabdb2b1a408047f14a349737380c49fbf81b41a1e12433e4923c3e1"
+  },
+  "id": "KPH7ccFKS1TrIjFq",
+  "tags": []
+}
