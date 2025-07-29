@@ -1,0 +1,165 @@
+{
+  "name": "Gmail send",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "a11d4060-221c-4dde-8580-32ae2a73cf6e",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        120
+      ],
+      "webhookId": "a889d2ae-2159-402f-b326-5f61e90f602e"
+    },
+    {
+      "parameters": {
+        "content": "## Start by saying 'hi'\n![Button](https://i.imgur.com/PrIBJI6.png)",
+        "height": 149,
+        "width": 150
+      },
+      "id": "9cce2500-4c73-4df4-a87f-6d7ab239f9c3",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        180,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "agent": "conversationalAgent",
+        "promptType": "define",
+        "text": "=If any personal information is provide then you replaced it with masked as like my name is abc email is abc@gmail.com, birthday and adress.masked it all personal information make them masked.\n{{ $json.chatInput }}",
+        "options": {}
+      },
+      "id": "2cda36e1-c961-41ea-a924-da3ba80b9481",
+      "name": "Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        780,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "options": {
+          "temperature": 0.4,
+          "topP": 1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        600,
+        340
+      ],
+      "id": "b8289e5c-b593-4b0f-af25-786c971325df",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "h01ysdiSaL19L30F",
+          "name": "Google Gemini(PaLM) Api account 11"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        740,
+        360
+      ],
+      "id": "e03ef605-e9d6-45be-bb1e-8aea2c540df6",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "sendTo": "somratsheikh5002@gmail.com",
+        "subject": "Hi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        980,
+        360
+      ],
+      "id": "b8adf984-913e-44a0-8390-e7fcb987a938",
+      "name": "Send a message in Gmail",
+      "webhookId": "f5438c45-c8bf-4c02-9320-e24abdd42d59",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YI3vDgczm2UtsDJx",
+          "name": "Gmail account 6"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "65ccc793-4bee-4bfd-a739-6eacdd35edc8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "47602d97fabdb2b1a408047f14a349737380c49fbf81b41a1e12433e4923c3e1"
+  },
+  "id": "YcZqKIJQIvWymK7B",
+  "tags": []
+}
